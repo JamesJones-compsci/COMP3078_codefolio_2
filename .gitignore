@@ -1,0 +1,12 @@
+﻿appsettings.*.json
+bin/
+obj/
+*.db
+.env
+.vs/
+.idea/
+publish/
+*.user
+*.suo
+appsettings.Development.json
+.env.example
