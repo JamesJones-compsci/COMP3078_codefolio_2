@@ -7,16 +7,38 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Load environment variables from Docker
+// ----------------------------
+// Load environment variables
+// ----------------------------
 Console.WriteLine("[DEBUG] ADMIN_PASSWORD=" + Environment.GetEnvironmentVariable("ADMIN_PASSWORD"));
 
-// Inject environment variables into configuration
-builder.Configuration["ConnectionStrings:DefaultConnection"] = Environment.GetEnvironmentVariable("DB_CONNECTION");
+// Read database credentials from environment
+var dbHost = Environment.GetEnvironmentVariable("DB_HOST");
+var dbPort = Environment.GetEnvironmentVariable("DB_PORT") ?? "5432";
+var dbName = Environment.GetEnvironmentVariable("DB_NAME");
+var dbUser = Environment.GetEnvironmentVariable("DB_USER");
+
+// Docker secret for DB password
+var dbPasswordFile = Environment.GetEnvironmentVariable("DB_PASSWORD_FILE") ?? "/run/secrets/db_password";
+string dbPassword = "";
+if (File.Exists(dbPasswordFile))
+{
+    dbPassword = File.ReadAllText(dbPasswordFile).Trim();
+}
+
+// Build PostgreSQL connection string
+var connectionString = $"Host={dbHost};Port={dbPort};Database={dbName};Username={dbUser};Password={dbPassword};Pooling=true;Trust Server Certificate=true;";
+builder.Configuration["ConnectionStrings:DefaultConnection"] = connectionString;
+Console.WriteLine("[DEBUG] Using connection string: " + connectionString.Replace(dbPassword, "****"));
+
+// Configure SendGrid from environment
 builder.Configuration["SendGrid:ApiKey"] = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
 builder.Configuration["SendGrid:FromEmail"] = Environment.GetEnvironmentVariable("SENDGRID_FROM_EMAIL");
 builder.Configuration["SendGrid:FromName"] = Environment.GetEnvironmentVariable("SENDGRID_FROM_NAME");
 
-// Add services to the container
+// ----------------------------
+// Add services
+// ----------------------------
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
@@ -46,7 +68,9 @@ var app = builder.Build();
 
 Console.WriteLine("[DEBUG] Starting CodeFolio app...");
 
-// Retry loop for database readiness
+// ----------------------------
+// Retry loop for DB readiness
+// ----------------------------
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -78,7 +102,9 @@ using (var scope = app.Services.CreateScope())
         return;
     }
 
-    // Seed roles
+    // ----------------------------
+    // Seed roles and admin user
+    // ----------------------------
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 
@@ -89,7 +115,6 @@ using (var scope = app.Services.CreateScope())
             await roleManager.CreateAsync(new IdentityRole(role));
     }
 
-    // Seed admin user
     string adminEmail = Environment.GetEnvironmentVariable("ADMIN_EMAIL");
     string adminPassword = Environment.GetEnvironmentVariable("ADMIN_PASSWORD");
 
@@ -114,11 +139,13 @@ using (var scope = app.Services.CreateScope())
     if (!(await userManager.IsInRoleAsync(adminUser, "Admin")))
         await userManager.AddToRoleAsync(adminUser, "Admin");
 
-    // Seed resume sections (if needed)
+    // Seed resume sections
     await DbInitializer.SeedResumeSections(services);
 }
 
+// ----------------------------
 // Configure HTTP request pipeline
+// ----------------------------
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -130,6 +157,7 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapRazorPages();
 app.MapControllerRoute(
     name: "default",
