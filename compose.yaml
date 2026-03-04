@@ -1,0 +1,35 @@
+﻿version: "3.9"
+
+services:
+  app:
+    container_name: codefolio_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    env_file:
+      - .env
+
+    environment:
+      # ASP.NET Core in production
+      ASPNETCORE_URLS: http://0.0.0.0:8080
+      ASPNETCORE_ENVIRONMENT: Production
+
+    ports:
+      - "8081:8080"
+
+    # Mount a volume to persist DataProtection keys across container restarts
+    volumes:
+      - data-protection:/root/.aspnet/DataProtection-Keys
+      
+      # Optional: if your app writes any files, you can add additional volumes
+      # - app-storage:/app/storage
+
+    restart: unless-stopped
+
+# Define named volumes for persistent data
+volumes:
+  data-protection:
+    driver: local
+  # app-storage:
+  #   driver: local

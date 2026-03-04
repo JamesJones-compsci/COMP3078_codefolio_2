@@ -5,15 +5,18 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["CodeFolio/CodeFolio.csproj", "CodeFolio/"]
-RUN dotnet restore "CodeFolio/CodeFolio.csproj"
+
+# Copy csproj from root
+COPY CodeFolio.csproj .
+RUN dotnet restore CodeFolio.csproj
+
+# Copy everything else
 COPY . .
-WORKDIR "/src/CodeFolio"
-RUN dotnet build "CodeFolio.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build CodeFolio.csproj -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "CodeFolio.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish CodeFolio.csproj -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
