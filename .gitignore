@@ -9,3 +9,9 @@ publish/
 *.user
 *.suo
 appsettings.Development.json
+
+# Secrets
+secrets/
+.env.production
+.env*
+*.txt
