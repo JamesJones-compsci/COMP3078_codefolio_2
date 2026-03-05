@@ -10,28 +10,35 @@ var builder = WebApplication.CreateBuilder(args);
 // ----------------------------
 // Load environment variables
 // ----------------------------
+Console.WriteLine("[DEBUG] ADMIN_EMAIL=" + Environment.GetEnvironmentVariable("ADMIN_EMAIL"));
 Console.WriteLine("[DEBUG] ADMIN_PASSWORD=" + Environment.GetEnvironmentVariable("ADMIN_PASSWORD"));
 
-// Read database credentials from environment
+// ----------------------------
+// Read database credentials from environment (.env.production)
+// ----------------------------
 var dbHost = Environment.GetEnvironmentVariable("DB_HOST");
 var dbPort = Environment.GetEnvironmentVariable("DB_PORT") ?? "5432";
 var dbName = Environment.GetEnvironmentVariable("DB_NAME");
 var dbUser = Environment.GetEnvironmentVariable("DB_USER");
+var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
+var dbSslMode = Environment.GetEnvironmentVariable("DB_SSLMODE") ?? "Require";
 
-// Docker secret for DB password
-var dbPasswordFile = Environment.GetEnvironmentVariable("DB_PASSWORD_FILE") ?? "/run/secrets/db_password";
-string dbPassword = "";
-if (File.Exists(dbPasswordFile))
+if (string.IsNullOrEmpty(dbHost) || string.IsNullOrEmpty(dbName) ||
+    string.IsNullOrEmpty(dbUser) || string.IsNullOrEmpty(dbPassword))
 {
-    dbPassword = File.ReadAllText(dbPasswordFile).Trim();
+    Console.WriteLine("[ERROR] One or more database environment variables are missing!");
+    return;
 }
 
-// Build PostgreSQL connection string
-var connectionString = $"Host={dbHost};Port={dbPort};Database={dbName};Username={dbUser};Password={dbPassword};Pooling=true;Trust Server Certificate=true;";
+// Build PostgreSQL connection string for Render
+var connectionString = $"Host={dbHost};Port={dbPort};Database={dbName};Username={dbUser};Password={dbPassword};Pooling=true;SSL Mode={dbSslMode};Trust Server Certificate=true;";
 builder.Configuration["ConnectionStrings:DefaultConnection"] = connectionString;
+
 Console.WriteLine("[DEBUG] Using connection string: " + connectionString.Replace(dbPassword, "****"));
 
-// Configure SendGrid from environment
+// ----------------------------
+// Configure SendGrid
+// ----------------------------
 builder.Configuration["SendGrid:ApiKey"] = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
 builder.Configuration["SendGrid:FromEmail"] = Environment.GetEnvironmentVariable("SENDGRID_FROM_EMAIL");
 builder.Configuration["SendGrid:FromName"] = Environment.GetEnvironmentVariable("SENDGRID_FROM_NAME");
@@ -84,9 +91,9 @@ using (var scope = app.Services.CreateScope())
         try
         {
             var context = services.GetRequiredService<AppDbContext>();
-            context.Database.Migrate(); // Apply migrations
+            context.Database.Migrate(); // Apply migrations safely on existing Render DB
             dbReady = true;
-            Console.WriteLine("[DEBUG] Database ready, applying migrations...");
+            Console.WriteLine("[DEBUG] Database ready, migrations applied if needed...");
             break;
         }
         catch (Exception ex)

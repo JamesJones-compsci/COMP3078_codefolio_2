@@ -2,24 +2,6 @@
 
 services:
   # ===========================
-  # PostgreSQL Database
-  # ===========================
-  db:
-    image: postgres:15
-    container_name: codefolio_db
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: classmate_3000_db
-      POSTGRES_USER: classmate_user
-      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
-    volumes:
-      - db_data:/var/lib/postgresql/data
-    secrets:
-      - db_password
-    networks:
-      - codefolio_net
-
-  # ===========================
   # CodeFolio Web App
   # ===========================
   app:
@@ -32,20 +14,11 @@ services:
     environment:
       ASPNETCORE_URLS: http://0.0.0.0:8080
       ASPNETCORE_ENVIRONMENT: Production
-      ADMIN_PASSWORD_FILE: /run/secrets/admin_password
-      DB_PASSWORD_FILE: /run/secrets/db_password
-      SENDGRID_API_KEY_FILE: /run/secrets/sendgrid_api_key
     ports:
-      - "8080:8080"
+      - "5000:8080"
     volumes:
       - data-protection:/root/.aspnet/DataProtection-Keys
       - app-storage:/app/storage
-    secrets:
-      - admin_password
-      - db_password
-      - sendgrid_api_key
-    depends_on:
-      - db
     networks:
       - codefolio_net
     restart: unless-stopped
@@ -77,18 +50,6 @@ volumes:
   app-storage:
   caddy_data:
   caddy_config:
-  db_data:
-
-# ===========================
-# Docker Secrets
-# ===========================
-secrets:
-  admin_password:
-    file: ./secrets/admin_password.txt
-  db_password:
-    file: ./secrets/db_password.txt
-  sendgrid_api_key:
-    file: ./secrets/sendgrid_api_key.txt
 
 # ===========================
 # Network
