@@ -29,4 +29,27 @@ public class ResumeController : Controller
         var resumeSections = await _context.ResumeSections.ToListAsync();
         return View("Dynamic", resumeSections);
     }
+    
+    [HttpGet]
+    [Authorize] // Only logged-in users can access
+    public IActionResult CoverLetter()
+    {
+        return View();
+    }
+
+    [HttpGet]
+    [Authorize] // Only logged-in users can access
+    public IActionResult ReferenceLetter()
+    {
+        return View();
+    }
+    
+    [HttpGet]
+    [Authorize] // Only logged-in users
+    public IActionResult Capstone()
+    {
+        return View();
+    }
+    
+    
 }
