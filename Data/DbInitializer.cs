@@ -63,91 +63,96 @@ public class DbInitializer
     
     
     // Added this method to seed ResumeSections
-    public static async Task SeedResumeSections(IServiceProvider serviceProvider)
+public static async Task SeedResumeSections(IServiceProvider serviceProvider)
+{
+    using var scope = serviceProvider.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    // Delete all existing ResumeSections first 
+    if (await context.ResumeSections.AnyAsync())
     {
-        using var scope = serviceProvider.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        context.ResumeSections.RemoveRange(context.ResumeSections);
+        await context.SaveChangesAsync();
+    }
 
-        // Delete all existing ResumeSections first 
-        if (await context.ResumeSections.AnyAsync())
+    // Then re-add the default seed data matching your updated static Resume
+    context.ResumeSections.AddRange(
+        new ResumeSection
         {
-            context.ResumeSections.RemoveRange(context.ResumeSections);
-            await context.SaveChangesAsync();
-        }
+            ResumeTitle = "Highlight of Skills",
+            ResumeContent = "<hr>" +
+                            "<ul>" +
+                            "<li>Proficiency in Object-Oriented Programming (Java, C#, Python)</li>" +
+                            "<li>Web Development: Frontend (HTML, CSS, JavaScript, React), Backend (ASP.NET, Spring Boot, Node.js)</li>" +
+                            "<li>Full-Stack Development Experience, including MERN & MEAN architectures</li>" +
+                            "<li>Database Management: SQL, PostgreSQL, MongoDB; schema design & query optimization</li>" +
+                            "<li>Cloud & Microservices: Docker, REST APIs, microservices architecture, JWT authentication, OAuth2, Keycloak</li>" +
+                            "<li>Understanding of SDLC, Agile methodologies (Scrum), and Waterfall model</li>" +
+                            "</ul>"
+        },
+        new ResumeSection
+        {
+            ResumeTitle = "Core Competency Skills",
+            ResumeContent = "<hr>" +
+                            "<ul>" +
+                            "<li>Clear and Effective Communication</li>" +
+                            "<li>Strong Interpersonal Skills</li>" +
+                            "<li>Proactive Work Ethic</li>" +
+                            "<li>Team Collaboration across SDLC and cloud-based/microservices projects</li>" +
+                            "<li>Problem-solving in secure and scalable software environments</li>" +
+                            "</ul>"
+        },
+        new ResumeSection
+        {
+            ResumeTitle = "Educational Experience",
+            ResumeContent = "<hr>" +
+                            "<p><strong>Computer Programming and Analysis</strong> | Sept. 2023 – Apr. 2025<br />George Brown College, Toronto</p>" +
+                            "<ul>" +
+                            "<li>Full-stack development, cloud services, microservices, and secure web applications</li>" +
+                            "<li>Developed proficiency in software development methodologies, testing, and best practices</li>" +
+                            "<li>Studied database management, optimization techniques, and cloud integration</li>" +
+                            "</ul>"
+        },
+        new ResumeSection
+        {
+            ResumeTitle = "Work History",
+            ResumeContent = "<hr>" +
+                            "<p><strong>Fitness Coach/Owner</strong> | Nov. 2020 – Present<br />JJ’s Fitness Toronto</p>" +
+                            "<ul>" +
+                            "<li>Develop and implement structured training programs</li>" +
+                            "<li>Analyze client progress and adjust plans</li>" +
+                            "<li>Manage business operations, budgeting, and marketing</li>" +
+                            "</ul>"
+        },
+        new ResumeSection
+        {
+            ResumeTitle = "Special Projects",
+            ResumeContent = "<hr>" +
+                            "<p><strong>CodeFolio – Personal Portfolio Web App</strong> | Mar. 2026<br /><em>Full Stack Development I</em></p>" +
+                            "<ul>" +
+                            "<li>Developed a full-stack portfolio web application using ASP.NET Core MVC, EF Core, PostgreSQL, Razor Pages, HTML/CSS/Bootstrap, and C#</li>" +
+                            "<li>Implemented role-based authentication, dynamic project & resume management, and email notifications via SendGrid</li>" +
+                            "<li>Containerized the application using Docker and deployed it to a cloud platform</li>" +
+                            "<li>Gained experience in secure backend development, responsive front-end design, and full-stack application architecture best practices</li>" +
+                            "</ul>" +
 
-        // Then re-add the default seed data
-        context.ResumeSections.AddRange(
-                new ResumeSection
-                {
-                    ResumeTitle = "Highlight of Skills",
-                    ResumeContent = "     "
-                    
-                },
-                new ResumeSection
-                {
-                    ResumeTitle = "Computer Programming Skills",
-                    ResumeContent = "<hr>" +
-                                    "<ul>" +
-                                    "<li>Proficiency in Object-Oriented Programming (Java, C#)</li>" +
-                                    "<li>Web Development Fundamentals (ASP.NET, HTML, CSS, JavaScript)</li>" +
-                                    "<li>Relational Databases & SQL (Schema Design, Query Optimization)</li>" +
-                                    "<li>Full-Stack Development Experience</li>" +
-                                    "<li>Understanding of Software Development Life Cycle (SDLC), Agile methodologies (Scrum), and Waterfall model</li>" +
-                                    "</ul>"
-                    
-                },
-                new ResumeSection
-                {
-                    ResumeTitle = "Core Competency Skills",
-                    ResumeContent = "<hr>" +
-                                    "<ul>" +
-                                    "<li>Clear and Effective Communication</li>" +
-                                    "<li>Strong Interpersonal Skills</li>" +
-                                    "<li>Proactive Work Ethic</li>" +
-                                    "<li>Team Collaboration across the SDLC, including Agile methodologies (Scrum) and traditional models like Waterfall</li>" +
-                                    "</ul>"
-                    
-                },
-                new ResumeSection
-                {
-                    ResumeTitle = "Educational Experience",
-                    ResumeContent =
-                        "<hr>" +
-                        "<p><strong>Computer Programming and Analysis</strong> | Sept. 2023 – Apr. 2025<br />George Brown College, Toronto</p>" +
-                        "<ul>" +
-                        "<li>Full-stack development, web applications, and mobile app development experience</li>" +
-                        "<li>Proficiency in software development methodologies</li>" +
-                        "<li>Studied database management and optimization</li>" +
-                        "</ul>"
-                },
-                new ResumeSection
-                {
-                    ResumeTitle = "Work History",
-                    ResumeContent = "<hr>" +
-                                    "<p><strong>Fitness Coach/Owner</strong> | Nov. 2020 – Present<br />JJ’s Fitness Toronto</p>" +
-                                    "<ul>" +
-                                    "<li>Develop and implement structured training programs</li>" +
-                                    "<li>Analyze client progress and adjust plans</li>" +
-                                    "<li>Manage business operations, budgeting, and marketing</li>" +
-                                    "</ul>"
-                },
-                new ResumeSection
-                {
-                    ResumeTitle = "Special Projects",
-                    ResumeContent = "     "
-                    
-                },
-                new ResumeSection
-                {
-                    ResumeTitle = " ",
-                    ResumeContent = "<p><strong>Project Management Tool – Web Application Development</strong> | Jan. 2025</p>" +
-                                    "<ul>" +
-                                    "<li>Developed dynamic web application featuring front-end UI/UX design, back-end logic, and database integration</li>" +
-                                    "<li>Integrated PostgreSQL database management for storing and retrieving data efficiently" +
-                                    "<li>Focused on scalability and maintainability, applying best coding practices to optimize performance</li>" +
-                                    "</ul>"
-                }
-            );
-            await context.SaveChangesAsync();
-     }
+                            "<p class='mt-3'><strong>Classmate – Full-Stack Microservices Student Collaboration Platform</strong> | Dec. 2025<br /><em>Full Stack Development / Self-Directed Advanced Project</em></p>" +
+                            "<ul>" +
+                            "<li>Built a secure full-stack microservices application using Spring Boot, React, Node.js, MongoDB/Postgres, Docker, and Docker Compose</li>" +
+                            "<li>Implemented authentication/authorization with Keycloak, OAuth2, OpenID Connect, and JWT for protected REST APIs</li>" +
+                            "<li>Designed RESTful microservices and integrated frontend-backend communication while containerizing the environment for reproducibility</li>" +
+                            "<li>Strengthened skills in distributed systems, secure API design, microservices architecture, and version control with Git/GitHub</li>" +
+                            "</ul>" +
+
+                            "<p class='mt-3'><strong>Customer Churn Prediction Using Machine Learning</strong> | Dec. 2025<br /><em>Machine Learning / Data Analytics</em></p>" +
+                            "<ul>" +
+                            "<li>Developed ML pipeline in Python using Pandas, NumPy, Scikit-learn, Matplotlib, and Seaborn to predict customer churn</li>" +
+                            "<li>Performed data cleaning, feature engineering, encoding categorical variables, and model evaluation using confusion matrices and ROC curves</li>" +
+                            "<li>Gained hands-on experience in interpreting ML results for business decisions and debugging preprocessing pipelines</li>" +
+                            "</ul>"
+        }
+    );
+
+        await context.SaveChangesAsync();
+    }
  }
