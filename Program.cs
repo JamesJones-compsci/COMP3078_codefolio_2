@@ -8,6 +8,10 @@ using DotNetEnv; // Make sure you have DotNetEnv package installed
 
 var builder = WebApplication.CreateBuilder(args);
 
+// LOGGING 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
 // ----------------------------
 // Load local .env file if exists (for dotnet run)
 // ----------------------------
@@ -191,18 +195,27 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
+    // Optional: comment this if issues occur on Render
+    // app.UseHttpsRedirection();
 }
 
-app.UseHttpsRedirection();
-app.UseStaticFiles();
 app.UseRouting();
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
+
+// HEALTH CHECK 
+app.MapGet("/health", () => Results.Ok(new { status = "OK", app = "CodeFolio" }));
 
 app.MapRazorPages();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}"
 );
+
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+app.Urls.Add($"http://*:{port}");
+
+Console.WriteLine($"[DEBUG] Listening on port {port}");
 
 app.Run();
