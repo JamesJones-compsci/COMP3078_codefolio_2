@@ -113,7 +113,7 @@ public static async Task SeedResumeSections(IServiceProvider serviceProvider)
         {
             ResumeTitle = "Educational Experience",
             ResumeContent = "<hr>" +
-                            "<p><strong>Computer Programming and Analysis</strong> | Sept. 2023 – Apr. 2025<br />George Brown College, Toronto</p>" +
+                            "<p><strong>Computer Programming and Analysis</strong> | Sept. 2023 – Apr. 2026<br />George Brown College, Toronto</p>" +
                             "<ul>" +
                             "<li>Full-stack development, cloud services, microservices, and secure web applications</li>" +
                             "<li>Hands-on experience with network security, traffic analysis using Wireshark, and vulnerability testing using Packet Sender and VPS environments</li>" +
