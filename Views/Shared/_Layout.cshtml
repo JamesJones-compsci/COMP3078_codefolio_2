@@ -47,27 +47,29 @@
                             </a>
                         </li>
 
-                        <!-- NEW: Cover Letter -->
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Resume" asp-action="CoverLetter">
-                                <i class="fa-solid fa-envelope-open-text"></i> Cover Letter
-                            </a>
-                        </li>
-
-                        <!-- NEW: Reference Letter -->
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Resume" asp-action="ReferenceLetter">
-                                <i class="fa-solid fa-user-check"></i> Reference Letter
-                            </a>
-                        </li>
                         
-                        <!-- NEW: Capstone Project Folder -->
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Resume" asp-action="Capstone">
-                                <i class="fa-solid fa-folder-open"></i> Capstone Project
-                            </a>
-                        </li>
                     }
+
+                    <!-- NEW: Cover Letter -->
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-controller="Resume" asp-action="CoverLetter">
+                            <i class="fa-solid fa-envelope-open-text"></i> Cover Letter
+                        </a>
+                    </li>
+
+                    <!-- NEW: Reference Letter -->
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-controller="Resume" asp-action="ReferenceLetter">
+                            <i class="fa-solid fa-user-check"></i> Reference Letter
+                        </a>
+                    </li>
+
+                    <!-- NEW: Capstone Project Folder -->
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-controller="Resume" asp-action="Capstone">
+                            <i class="fa-solid fa-folder-open"></i> Capstone Project
+                        </a>
+                    </li>
                     
                     <li class="nav-item">
                         @if (User.IsInRole("Admin"))

@@ -31,21 +31,24 @@ public class ResumeController : Controller
     }
     
     [HttpGet]
-    [Authorize] // Only logged-in users can access
+    // [Authorize] // Only logged-in users can access
+    [AllowAnonymous] // Anyone can access
     public IActionResult CoverLetter()
     {
         return View();
     }
 
     [HttpGet]
-    [Authorize] // Only logged-in users can access
+    // [Authorize] // Only logged-in users can access
+    [AllowAnonymous] // Anyone can access
     public IActionResult ReferenceLetter()
     {
         return View();
     }
     
     [HttpGet]
-    [Authorize] // Only logged-in users
+    // [Authorize] // Only logged-in users can access
+    [AllowAnonymous] // Anyone can access
     public IActionResult Capstone()
     {
         return View();
