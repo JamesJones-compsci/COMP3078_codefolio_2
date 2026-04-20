@@ -73,11 +73,11 @@ Console.WriteLine("[DEBUG] Application starting...");
 #region DATABASE MIGRATION (CRITICAL - MUST RUN FIRST)
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>(); 
 
     try
     {
-        Console.WriteLine("[DEBUG] Applying migrations...");  
+        Console.WriteLine("[DEBUG] Applying migrations...");    
         db.Database.Migrate();
         Console.WriteLine("[DEBUG] Migrations completed.");
     }
