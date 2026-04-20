@@ -48,17 +48,31 @@ public class ContactController : Controller
                 $"From: {contactMessage.ContactName} ({contactMessage.ContactEmail})\n\n{contactMessage.ConMessage}"
             );
             
-            TempData["SentAt"] = contactMessage.SentAt.ToString("o"); // Store as ISO string/format
-            TempData["SenderName"] = contactMessage.ContactName;      // store name
-            return RedirectToAction("ThankYou");
+            return RedirectToAction("ThankYou", new
+            {
+                name = contactMessage.ContactName,
+                time = contactMessage.SentAt.ToString("o")
+            });
         }
         return View(contactMessage);
     }
     
     
     [AllowAnonymous]
-    public IActionResult ThankYou()
+    public IActionResult ThankYou(string name, string time)
     {
+        ViewBag.Name = name;
+
+        DateTime? sentAt = null;
+
+        if (!string.IsNullOrEmpty(time) &&
+            DateTime.TryParse(time, out var parsed))
+        {
+            sentAt = parsed.ToLocalTime();
+        }
+
+        ViewBag.SentAt = sentAt;
+
         return View();
     }
 }

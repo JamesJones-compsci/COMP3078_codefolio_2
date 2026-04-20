@@ -18,22 +18,16 @@
 </div>
 
 <div class="container mt-4 pt-4">
-<hr style="border-top: 4px solid #708090;" />
-@{
-    ViewBag.Title = "Thank You!";
-    Layout = "_Layout";
-    
-     // Parse TempData string back to DateTime, if available
-     DateTime? sentAt = null;
-     string senderName = TempData["SenderName"] as string;
-     
-     if (TempData["SentAt"] != null)
-     {
-         sentAt = DateTime.Parse(TempData["SentAt"].ToString()).ToLocalTime();
-     }
-}
-<h1 class="text-center">@ViewData["Title"]</h1>
-<hr style="border-top: 4px solid #708090;" />
+    <hr style="border-top: 4px solid #708090;" />
+    @{
+        ViewBag.Title = "Thank You!";
+        Layout = "_Layout";
+
+        string senderName = ViewBag.Name as string;
+        DateTime? sentAt = ViewBag.SentAt as DateTime?;
+    }
+    <h1 class="text-center">@ViewBag.Title</h1>
+    <hr style="border-top: 4px solid #708090;" />
 
 
 <h2>Thank you for your message!</h2>
@@ -45,10 +39,10 @@
 
 <p>I’ll be in touch soon.</p>
 
-@if (sentAt != null)
-{
-    <p class="text-success">
-        Message received on: <strong>@sentAt?.ToString("f")</strong>
-    </p>
-}
+    @if (sentAt != null)
+    {
+        <p class="text-success">
+            Message received on: <strong>@sentAt?.ToString("f")</strong>
+        </p>
+    }
 </div>
