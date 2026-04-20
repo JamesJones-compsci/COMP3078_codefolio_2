@@ -75,22 +75,16 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-    var retries = 10;
-    var delay = TimeSpan.FromSeconds(5);
-
-    for (int i = 0; i < retries; i++)
+    try
     {
-        try
-        {
-            db.Database.Migrate();
-            Console.WriteLine("[DEBUG] Database migrations applied successfully.");
-            break;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"[DEBUG] DB not ready ({i + 1}/{retries}): {ex.Message}");
-            Thread.Sleep(delay);
-        }
+        Console.WriteLine("[DEBUG] Applying migrations...");  
+        db.Database.Migrate();
+        Console.WriteLine("[DEBUG] Migrations completed.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("[ERROR] Migration failed: " + ex.Message);
+        throw; // fail fast so Render shows real issue
     }
 }
 #endregion
