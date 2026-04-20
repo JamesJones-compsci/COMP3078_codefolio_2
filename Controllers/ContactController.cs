@@ -42,12 +42,12 @@ public class ContactController : Controller
             
             // TODO Optionally, send an email here (SendGrid)
             // Send an email notification
-            await _emailSender.SendEmailAsync(
+           /* await _emailSender.SendEmailAsync(
                 "djincognito2366@gmail.com", // your email
                 $"New Contact Message from {contactMessage.ContactName}",
                 $"From: {contactMessage.ContactName} ({contactMessage.ContactEmail})\n\n{contactMessage.ConMessage}"
             );
-            
+            */
             return RedirectToAction("ThankYou", new
             {
                 name = contactMessage.ContactName,
