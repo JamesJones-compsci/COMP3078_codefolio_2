@@ -39,7 +39,7 @@
                     </li>
 
                     <!-- Dynamic Resume: Only for logged-in users -->
-                    @if (User.Identity.IsAuthenticated)
+                    @if (User?.Identity?.IsAuthenticated == true)
                     {
                         <li class="nav-item">
                             <a class="nav-link text-white" asp-controller="Resume" asp-action="Dynamic">
@@ -72,7 +72,7 @@
                     </li>
                     
                     <li class="nav-item">
-                        @if (User.IsInRole("Admin"))
+                        @if (User?.IsInRole("Admin") == true)
                         {
                             <a class="nav-link text-white" asp-controller="Project" asp-action="Index">
                                 <i class="fa-solid fa-gear"></i> Manage Projects <span class="badge bg-secondary">Admin</span>
@@ -86,7 +86,7 @@
                         }
                     </li>
                     <li class="nav-item">
-                        @if (User.IsInRole("Admin"))
+                        @if (User?.IsInRole("Admin") == true)
                         {
                             <a class="nav-link text-white" asp-controller="BlogPost" asp-action="Index">
                                 <i class="fa-solid fa-gear"></i>Manage Blog <span class="badge bg-secondary">Admin</span>
@@ -108,16 +108,18 @@
                 
                 <!-- Authentication Links -->
                 <ul class="navbar-nav ms-auto">
-                    @if (User.Identity.IsAuthenticated)
+                    @if (User?.Identity?.IsAuthenticated == true)
                     {
                         <li class="nav-item">
                             <span class="nav-link">
-                                Hello, @(User.FindFirst("FirstName")?.Value ?? User.Identity.Name)!
+                                Hello, @(User?.FindFirst("FirstName")?.Value ?? User?.Identity?.Name ?? "Guest")!
                             </span>
                         </li>
                         <li class="nav-item">
                             <span class="nav-link">
-                                Role: @string.Join(", ", User.Claims.Where(c => c.Type == System.Security.Claims.ClaimTypes.Role).Select(c => c.Value))
+                                Role: @string.Join(", ", (User?.Claims ?? Enumerable.Empty<System.Security.Claims.Claim>())
+                                              .Where(c => c.Type == System.Security.Claims.ClaimTypes.Role)
+                                              .Select(c => c.Value))
                             </span>
                         </li>
                         
