@@ -84,7 +84,7 @@ using (var scope = app.Services.CreateScope())
     catch (Exception ex)
     {
         Console.WriteLine("[ERROR] Migration failed: " + ex.Message);
-        throw; // fail fast so Render shows real issue
+        Console.WriteLine("[WARN] Continuing without DB migration...");
     }
 }
 #endregion
@@ -92,48 +92,56 @@ using (var scope = app.Services.CreateScope())
 #region SEEDING (RUN AFTER MIGRATIONS)
 using (var scope = app.Services.CreateScope())
 {
-    var services = scope.ServiceProvider;
-
-    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-
-    string[] roles = { "Admin", "User" };
-
-    foreach (var role in roles)
+    try
     {
-        if (!await roleManager.RoleExistsAsync(role))
+        var services = scope.ServiceProvider;
+
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+
+        string[] roles = { "Admin", "User" };
+
+        foreach (var role in roles)
         {
-            await roleManager.CreateAsync(new IdentityRole(role));
+            if (!await roleManager.RoleExistsAsync(role))
+            {
+                await roleManager.CreateAsync(new IdentityRole(role));
+            }
         }
-    }
 
-    var adminUser = await userManager.FindByEmailAsync(adminEmail);
+        var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
-    if (adminUser == null)
-    {
-        adminUser = new ApplicationUser
+        if (adminUser == null)
         {
-            UserName = adminEmail,
-            Email = adminEmail,
-            EmailConfirmed = true
-        };
+            adminUser = new ApplicationUser
+            {
+                UserName = adminEmail,
+                Email = adminEmail,
+                EmailConfirmed = true
+            };
 
-        var result = await userManager.CreateAsync(adminUser, adminPassword);
+            var result = await userManager.CreateAsync(adminUser, adminPassword);
 
-        if (!result.Succeeded)
-        {
-            Console.WriteLine("[ERROR] Admin user creation failed:");
-            foreach (var error in result.Errors)
-                Console.WriteLine(error.Description);
+            if (!result.Succeeded)
+            {
+                Console.WriteLine("[ERROR] Admin user creation failed:");
+                foreach (var error in result.Errors)
+                    Console.WriteLine(error.Description);
+            }
         }
-    }
 
-    if (!await userManager.IsInRoleAsync(adminUser, "Admin"))
+        if (!await userManager.IsInRoleAsync(adminUser, "Admin"))
+        {
+            await userManager.AddToRoleAsync(adminUser, "Admin");
+        }
+
+        await DbInitializer.SeedResumeSections(services);
+    }
+    catch (Exception ex)
     {
-        await userManager.AddToRoleAsync(adminUser, "Admin");
+        Console.WriteLine("[ERROR] Seeding failed: " + ex.Message);
+        Console.WriteLine("[WARN] Continuing without DB seeding...");
     }
-
-    await DbInitializer.SeedResumeSections(services);
 }
 #endregion
 
