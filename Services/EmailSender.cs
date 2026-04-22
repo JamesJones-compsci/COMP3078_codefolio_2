@@ -16,13 +16,13 @@ public class EmailSender : IEmailSender
 
     public EmailSender(IConfiguration configuration, ILogger<EmailSender> logger)
     {
-        _sendGridApiKey = configuration["SendGrid:ApiKey"] 
+        _sendGridApiKey = configuration["SENDGRID:APIKEY"] 
                           ?? throw new ArgumentNullException("SendGrid Key is missing");
         
-        _fromEmail = configuration["SendGrid:FromEmail"] 
+        _fromEmail = configuration["SENDGRID:FROMEMAIL"] 
                      ?? throw new ArgumentNullException("From Email is missing");
 
-        _fromName = configuration["SendGrid:FromName"] 
+        _fromName = configuration["SENDGRID:FROMNAME"] 
                     ?? throw new ArgumentNullException("From Name is missing");
         
         _logger = logger;
